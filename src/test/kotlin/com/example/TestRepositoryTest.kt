@@ -9,6 +9,7 @@ import java.time.Instant
 import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
+import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
 @MicronautTest
@@ -49,6 +50,17 @@ class TestRepositoryTest(
             assertEquals(1, results.toList().size)
         }
     }
+
+    @Test
+    fun testEmptyTableAsList() {
+        runTest {
+            val results = testRepository.findByScheduledTimeBefore(Instant.now())
+            assertNotNull(results)
+            assertIs<List<TestEntity>>(results)
+            assertEquals(0, results.size)
+        }
+    }
+
 
     @Test
     fun testWithListReturnType() {
