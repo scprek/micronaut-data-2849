@@ -1,0 +1,9 @@
+datasources:
+  default:
+    driverClassName: org.postgresql.Driver
+    dialect: POSTGRES
+---
+flyway:
+  datasources:
+    default:
+      enabled: true
