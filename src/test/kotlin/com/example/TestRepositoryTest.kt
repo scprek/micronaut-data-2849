@@ -50,4 +50,25 @@ class TestRepositoryTest(
         }
     }
 
+    @Test
+    fun testWithListReturnType() {
+        runTest {
+            testRepository.save(TestEntity(
+                id = UUID.randomUUID(),
+                destination = "test",
+                scheduledTime = Instant.now().minusSeconds(10),
+                payload = "test",
+                attempts = 0,
+                created = Instant.now()
+            ))
+            var results = testRepository.findAll()
+            assertIs<Flow<TestEntity>>(results)
+            assertEquals(1, results.toList().size)
+            // Throws: Cannot convert type [class com.example.TestEntity] to target type: interface kotlinx.coroutines.flow.Flow. Considering defining a TypeConverter bean to handle this case.
+            val listResults = testRepository.findByScheduledTimeBefore(Instant.now())
+            assertIs<List<TestEntity>>(listResults)
+            assertEquals(1, listResults.size)
+        }
+    }
+
 }
