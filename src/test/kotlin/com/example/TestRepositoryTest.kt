@@ -10,7 +10,6 @@ import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlin.test.assertNotNull
-import kotlin.test.assertNull
 
 @MicronautTest
 class TestRepositoryTest(
@@ -23,8 +22,6 @@ class TestRepositoryTest(
             var results = testRepository.findAll()
             assertIs<Flow<TestEntity>>(results)
             results = testRepository.findByScheduledTimeBeforeAndAttemptsLessThanEquals(Instant.now(), 5)
-            // Asserting it's null just to prove it is wrong
-            assertNull(results)
             assertIs<Flow<TestEntity>>(results)
         }
     }
@@ -52,18 +49,18 @@ class TestRepositoryTest(
     }
 
     @Test
-    fun testEmptyTableAsList() {
+    fun testEmptyTableQueryAnnotation() {
         runTest {
-            val results = testRepository.findByScheduledTimeBefore(Instant.now())
+            val results = testRepository.customQueryAnnotatedQuery(Instant.now())
             assertNotNull(results)
-            assertIs<List<TestEntity>>(results)
-            assertEquals(0, results.size)
+            assertIs<Flow<TestEntity>>(results)
+            assertEquals(0, results.toList().size)
         }
     }
 
 
     @Test
-    fun testWithListReturnType() {
+    fun testWithQueryAnnotation() {
         runTest {
             testRepository.save(TestEntity(
                 id = UUID.randomUUID(),
@@ -77,9 +74,9 @@ class TestRepositoryTest(
             assertIs<Flow<TestEntity>>(results)
             assertEquals(1, results.toList().size)
             // Throws: Cannot convert type [class com.example.TestEntity] to target type: interface kotlinx.coroutines.flow.Flow. Considering defining a TypeConverter bean to handle this case.
-            val listResults = testRepository.findByScheduledTimeBefore(Instant.now())
-            assertIs<List<TestEntity>>(listResults)
-            assertEquals(1, listResults.size)
+            val listResults = testRepository.customQueryAnnotatedQuery(Instant.now())
+            assertIs<Flow<TestEntity>>(listResults)
+            assertEquals(1, listResults.toList().size)
         }
     }
 

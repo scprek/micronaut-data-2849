@@ -1,6 +1,7 @@
 package com.example
 
 
+import io.micronaut.data.annotation.Query
 import io.micronaut.data.jdbc.annotation.JdbcRepository
 import io.micronaut.data.model.query.builder.sql.Dialect
 import io.micronaut.data.repository.kotlin.CoroutineCrudRepository
@@ -11,11 +12,8 @@ import java.util.*
 
 @JdbcRepository(dialect = Dialect.POSTGRES)
 abstract class TestRepository: CoroutineCrudRepository<TestEntity, UUID> {
-    abstract suspend fun findByScheduledTimeBeforeAndAttemptsLessThanEquals(scheduledTime: Instant, attempts: Int): Flow<TestEntity>
+    abstract fun findByScheduledTimeBeforeAndAttemptsLessThanEquals(scheduledTime: Instant, attempts: Int): Flow<TestEntity>
 
-    /**
-     * Showcase that making this return a List instead of Flow works... idk the implications of this. Does it internally
-     * call Flow.toList()?
-     */
-    abstract suspend fun findByScheduledTimeBefore(scheduledTime: Instant): List<TestEntity>
+    @Query("SELECT * FROM test_table WHERE scheduled_time < :scheduledTime")
+    abstract fun customQueryAnnotatedQuery(scheduledTime: Instant): Flow<TestEntity>
 }
